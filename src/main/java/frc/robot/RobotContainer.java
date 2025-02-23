@@ -47,7 +47,7 @@ public class RobotContainer {
     }
 
     private void emergencyStop() { // Full stop code that stops everything.
-        elevatorSubsystem.stop();
+        elevatorSubsystem.stopElevator();
         coralEater.stopIntakeArm();
         coralEater.stopIntakeSpinning();
         coralPooper.stopIntestine();
@@ -92,13 +92,13 @@ public class RobotContainer {
 
 
         // Elevator Controls
-        driverController.rightBumper().whileTrue(new MoveElevator(elevatorSubsystem, -0.15)); // Vader Up
+        driverController.rightBumper().onTrue(new MoveElevator(elevatorSubsystem, 10));
         driverController.rightBumper().onTrue(Commands.print("Elevator Going Up")); // Debug Print
-        driverController.rightBumper().onFalse(new InstantCommand(() -> elevatorSubsystem.stop())); // Safety Stop
+        driverController.rightBumper().onFalse(new InstantCommand(() -> elevatorSubsystem.stopElevator())); // Safety Stop
 
-        driverController.leftBumper().whileTrue(new MoveElevator(elevatorSubsystem, 0.15)); // Vader Down
+        driverController.leftBumper().whileTrue(new MoveElevator(elevatorSubsystem, 0)); // Vader Down
         driverController.leftBumper().onTrue(Commands.print("Elevator Going Down")); // Debug Print
-        driverController.leftBumper().onFalse(new InstantCommand(() -> elevatorSubsystem.stop())); // Safety Stop
+        driverController.leftBumper().onFalse(new InstantCommand(() -> elevatorSubsystem.stopElevator())); // Safety Stop
 
    
         // Coral Arm

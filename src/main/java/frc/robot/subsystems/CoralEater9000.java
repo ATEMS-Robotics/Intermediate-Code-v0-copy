@@ -12,8 +12,8 @@ public class CoralEater9000 extends SubsystemBase {
 
 
     public CoralEater9000() {
-        armMotor = new TalonFX(23);  // Replace with actual CAN ID
-        intakeMotor = new TalonFX(22);  // Replace with actual CAN ID 
+        armMotor = new TalonFX(23, "rio");  // Replace with actual CAN ID
+        intakeMotor = new TalonFX(22, "rio");  // Replace with actual CAN ID 
     }
 
     /** Moves the arm up/down. Positive = up, Negative = down */

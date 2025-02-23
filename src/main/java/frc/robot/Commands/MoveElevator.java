@@ -5,26 +5,31 @@ import frc.robot.subsystems.ElevatorFella;
 
 public class MoveElevator extends Command {
     private final ElevatorFella elevator;
-    private final double speed;
+    private final double targetPosition;
 
-    public MoveElevator(ElevatorFella elevator, double speed) {
+    public MoveElevator(ElevatorFella elevator, double targetPosition) {
         this.elevator = elevator;
-        this.speed = speed;
+        this.targetPosition = targetPosition;
         addRequirements(elevator);
     }
 
-    @Override
-    public void execute() {
-        elevator.setSpeed(speed);
-    }
 
     @Override
+    public void initialize() {
+        elevator.moveToElevatorPosition(targetPosition);
+    }
+  
+    @Override
     public void end(boolean interrupted) {
-        elevator.setSpeed(0); // Stop the motor when command ends
+        // Ends the code if it is interrupted
+        if (interrupted) {
+            elevator.stopElevator();
+        }
     }
 
     @Override
     public boolean isFinished() {
-        return false; // Runs until button is released
+        //Stops the code when it is close to position
+        return Math.abs(elevator.getCurrentPosition() - targetPosition) < 0.5;
     }
 }

@@ -5,69 +5,84 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix6.hardware.TalonFX; // Kraken X60 motors use TalonFX
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.controls.*; // Needed for setting motor control modes
-import edu.wpi.first.math.filter.SlewRateLimiter;
+import com.ctre.phoenix6.configs.TalonFXConfiguration; 
+
 
 public class ElevatorFella extends SubsystemBase {
     private final TalonFX elevatorMotor1; // First Kraken X60 motor
     private final TalonFX elevatorMotor2; // Second Kraken X60 motor
-    private final SlewRateLimiter elevatorlimiter = new SlewRateLimiter(1.25);
+    private final TalonFXConfiguration config = new TalonFXConfiguration();
+    private final MotionMagicDutyCycle motionMagic = new MotionMagicDutyCycle(0);
 
     public ElevatorFella() {
-        elevatorMotor1 = new TalonFX(20); // Replace with your actual CAN ID
-        elevatorMotor2 = new TalonFX(21); // Replace with your actual CAN ID
+        elevatorMotor1 = new TalonFX(20, "rio"); // Replace with your actual CAN ID
+        elevatorMotor2 = new TalonFX(21, "rio"); // Replace with your actual CAN ID
         
        elevatorMotor1.setNeutralMode(NeutralModeValue.Brake); // Set the brake mode
        elevatorMotor2.setNeutralMode(NeutralModeValue.Brake); //Set the brake mode
+
+             // Configure PID values
+        config.Slot0.kS = 0.25; // Static friction compensation
+        config.Slot0.kV = 0.12; // Velocity feedforward
+        config.Slot0.kA = 0.01; // Acceleration feedforward
+        config.Slot0.kP = 4.8;  // Proportional gain
+        config.Slot0.kI = 0.0;  // Integral gain (leave 0 unless needed)
+        config.Slot0.kD = 0.1;  // Derivative gain
+
+        // Configure Motion Magic
+        config.MotionMagic.MotionMagicCruiseVelocity = 80; // Max velocity (rotations per second)
+        config.MotionMagic.MotionMagicAcceleration = 160;  // How fast it accelerates (rps/s)
+        config.MotionMagic.MotionMagicJerk = 1600;         // How smooth the motion transition is
+
+        // Apply configuration to motors
+        elevatorMotor1.getConfigurator().apply(config);
+        elevatorMotor2.getConfigurator().apply(config);
     }
 
     /**
      * Sets the elevator speed (positive = up, negative = down).
      * @param speed -1.0 to 1.0
      */
-    public void setSpeed(double speed) {
-        double holdVoltage = -.315  ; //Positin Holding Power
-        double elevatorDeadband = 0.02; //Ignores small values of stuff so it aint tweak out
-        if (Math.abs(speed) < elevatorDeadband) {
-            elevatorMotor1.setVoltage(holdVoltage);
-            elevatorMotor2.setVoltage(holdVoltage);
-        } else {
-            elevatorMotor1.setControl(new DutyCycleOut(speed));
-            elevatorMotor2.setControl(new DutyCycleOut(speed));
-        }
+    
        
+    
+
+    public double getCurrentPosition() {
+        return elevatorMotor1.getPosition().getValueAsDouble();
+    }
+
+    public void moveToElevatorPosition(double targetElevatorPosition) {
+        elevatorMotor1.setControl(motionMagic.withPosition(targetElevatorPosition));
+        elevatorMotor2.setControl(motionMagic.withPosition(targetElevatorPosition));
     }
 
     /** Stops the elevator */
-    public void stop() {
+    public void stopElevator() {
         elevatorMotor1.set(0);
         elevatorMotor2.set(0);
     }
 
-
+   
 
 
 
   public class MoveElevator extends Command {
         private final ElevatorFella elevator;
-        private final double speed;
+    
     
         public MoveElevator(ElevatorFella elevator, double speed) {
-            double limitedSpeed = elevatorlimiter.calculate(speed);
-            elevatorMotor1.set(limitedSpeed);
-            elevatorMotor2.set(limitedSpeed);
             this.elevator = elevator;
-            this.speed = speed;
             addRequirements(elevator); // Ensures only one command controls the elevator at a time
         }
     
         @Override
         public void execute() {
-            elevator.setSpeed(speed);
+
         }
     
         @Override
         public void end(boolean interrupted) {
-            elevator.stop(); // Stops the elevator when the command ends
+            elevator.stopElevator(); // Stops the elevator when the command ends
         }
     
         @Override
