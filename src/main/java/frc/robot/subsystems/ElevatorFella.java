@@ -1,20 +1,18 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue; // Kraken X60 motors use TalonFX
+
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.ctre.phoenix6.hardware.TalonFX; // Kraken X60 motors use TalonFX
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.controls.*; // Needed for setting motor control modes
-import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj2.command.SubsystemBase; // Needed for setting motor control modes
 
 public class ElevatorFella extends SubsystemBase {
     private final TalonFX elevatorMotor1; // First Kraken X60 motor
     private final TalonFX elevatorMotor2; // Second Kraken X60 motor
-    private final SlewRateLimiter elevatorlimiter = new SlewRateLimiter(1.25);
-
     public ElevatorFella() {
-        elevatorMotor1 = new TalonFX(20); // Replace with your actual CAN ID
-        elevatorMotor2 = new TalonFX(21); // Replace with your actual CAN ID
+        elevatorMotor1 = new TalonFX(20,"rio"); // Replace with your actual CAN ID
+        elevatorMotor2 = new TalonFX(21,"rio"); // Replace with your actual CAN ID
         
        elevatorMotor1.setNeutralMode(NeutralModeValue.Brake); // Set the brake mode
        elevatorMotor2.setNeutralMode(NeutralModeValue.Brake); //Set the brake mode
@@ -52,9 +50,7 @@ public class ElevatorFella extends SubsystemBase {
         private final double speed;
     
         public MoveElevator(ElevatorFella elevator, double speed) {
-            double limitedSpeed = elevatorlimiter.calculate(speed);
-            elevatorMotor1.set(limitedSpeed);
-            elevatorMotor2.set(limitedSpeed);
+
             this.elevator = elevator;
             this.speed = speed;
             addRequirements(elevator); // Ensures only one command controls the elevator at a time

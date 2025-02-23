@@ -1,19 +1,18 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX; // Kraken X60 motors use TalonFX
-import com.ctre.phoenix6.controls.*; // Needed for motor control modes
+
+import edu.wpi.first.wpilibj2.command.SubsystemBase; // Needed for motor control modes
 
 public class CoralEater9000 extends SubsystemBase {
     private final TalonFX armMotor; // Rotates the whole arm
     private final TalonFX intakeMotor; // Spins Omni wheels for intake
-    private final SlewRateLimiter armNoBreaky = new SlewRateLimiter(0.5);
 
 
     public CoralEater9000() {
-        armMotor = new TalonFX(23);  // Replace with actual CAN ID
-        intakeMotor = new TalonFX(22);  // Replace with actual CAN ID 
+        armMotor = new TalonFX(23,"rio");  // Replace with actual CAN ID
+        intakeMotor = new TalonFX(22,"rio");  // Replace with actual CAN ID 
     }
 
     /** Moves the arm up/down. Positive = up, Negative = down */
@@ -29,8 +28,6 @@ public class CoralEater9000 extends SubsystemBase {
         } else {
             armMotor.setControl(new DutyCycleOut(desiredPosition));
         }
-        double limitedSpeed = armNoBreaky.calculate(desiredPosition);
-        armMotor.set(limitedSpeed);
 
     }
     /** Spins the intake wheels. Positive = intake, Negative = outtake */
