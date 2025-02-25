@@ -27,7 +27,7 @@ public class ElevatorFella extends SubsystemBase {
         config.Slot0.kP = 0.0;  // Proportional gain
         config.Slot0.kI = 0.0;  // Integral gain (leave 0 unless needed)
         config.Slot0.kD = 0.0;  // Derivative gain
-        config.Slot0.kG = -5.0;  // Gravity 
+        
 
         // Configure Motion Magic
         config.MotionMagic.MotionMagicCruiseVelocity = 10; // Max velocity (rotations per second)
@@ -69,8 +69,9 @@ public class ElevatorFella extends SubsystemBase {
 
     /** Stops the elevator */
     public void stopElevator() {
-        elevatorMotor1.set(0);
-        elevatorMotor2.set(0);
+        //Holds Elevator in Place
+        elevatorMotor1.setVoltage(-.35);
+        elevatorMotor2.setVoltage(-.35);
     }
 
     @Override
