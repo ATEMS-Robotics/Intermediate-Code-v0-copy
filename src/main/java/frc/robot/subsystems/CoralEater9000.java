@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix6.hardware.TalonFX; // Kraken X60 motors use TalonFX
 import com.ctre.phoenix6.controls.*; // Needed for motor control modes
@@ -44,35 +45,13 @@ public class CoralEater9000 extends SubsystemBase {
         return armMotor.getPosition().getValueAsDouble();
     }
 
-    /** Moves arm to a specific position using Motion Magic */
-    public void moveToArmPosition(double targetArmPosition) {
-        armMotor.setControl(MotionMagic.withPosition(targetArmPosition));
-        armHeldPosition = targetArmPosition;
+     /** Converts encoder position to arm angle (TUNE this for your encoder setup) */
+     private double getArmAngle() {
+        return getCurrentPosition() * 360.0 / 2048.0; // Adjust based on gear ratio & encoder units
     }
-
-    /** Spins the intake wheels. Positive = intake, Negative = outtake */
-    public void setIntakeSpeed(double speed) {
-        intakeMotor.setControl(new DutyCycleOut(speed));
-    }
-
-    /** Stops all motors */
-    public void stopCoralEating() {
-        armMotor.set(0);
-        intakeMotor.setControl(new DutyCycleOut(0));
-    }
-
-    /** Stops intake arm */
-    public void stopIntakeArm() {
-        armMotor.set(0);
-    }
-
-    /** Stops intake spinning */
-    public void stopIntakeSpinning() {
-        intakeMotor.setControl(new DutyCycleOut(0));
-    }
-
-    /** Gravity Compensation Hold Mode */
-    public void holdPosition() {
+    
+       /** Gravity Compensation Hold Mode */
+       public void holdPosition() {
         double angle = getArmAngle(); // Implement this based on encoder values
         double holdVoltage = kG * Math.cos(Math.toRadians(angle));
 
@@ -82,15 +61,45 @@ public class CoralEater9000 extends SubsystemBase {
         armMotor.setVoltage(holdVoltage);
     }
 
-    /** Converts encoder position to arm angle (TUNE this for your encoder setup) */
-    private double getArmAngle() {
-        return getCurrentPosition() * 360.0 / 2048.0; // Adjust based on gear ratio & encoder units
+    /** Moves arm to a specific position using Motion Magic */
+    public Command moveToArmPosition(double targetArmPosition) {
+       return runOnce(() -> {
+        armMotor.setControl(MotionMagic.withPosition(targetArmPosition));
+        armHeldPosition = targetArmPosition;
+ 
+       }).andThen(run(() -> holdPosition()));
+        
     }
+
+    public Command holdArmCommand() {
+        return run(() -> holdPosition());
+    }
+
+    /** Spins the intake wheels. Positive = intake, Negative = outtake */
+    public Command spinIntakeCommand(double speed) {
+        return run(() -> intakeMotor.setControl(new DutyCycleOut(speed)));
+    }
+
+    /** Stops all motors */
+    public void stopCoralEating() {
+        armMotor.set(0);
+        intakeMotor.setControl(new DutyCycleOut(0));
+    }
+
+    //Add stop command for intake arm
+    /** Stops intake spinning */
+    public Command stopIntakeSpinning() {
+       return runOnce(() -> intakeMotor.setControl(new DutyCycleOut(0)));
+    }
+
+ 
+
+   
 
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-        if (armMotor.getVelocity().getValueAsDouble() < 0.1) { // If near stationary, hold position
+        if (armMotor.getVelocity().getValueAsDouble() < 0.) { // If near stationary, hold position
             holdPosition();
         } else {
             armMotor.setControl(MotionMagic.withPosition(armHeldPosition));

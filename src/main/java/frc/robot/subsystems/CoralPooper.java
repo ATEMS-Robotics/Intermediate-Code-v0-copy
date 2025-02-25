@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 
 public class CoralPooper extends SubsystemBase {
@@ -12,7 +14,9 @@ public class CoralPooper extends SubsystemBase {
     public CoralPooper() {
         coralIntestine = new SparkMax(24, MotorType.kBrushless); // Replace with actual CAN ID
         coralColon = new SparkMax(25, MotorType.kBrushless); // Replace with actual CAN ID
+        SparkMaxConfig coralColonConfig = new SparkMaxConfig();
 
+        coralColonConfig.idleMode(IdleMode.kBrake);
   
 
     }
