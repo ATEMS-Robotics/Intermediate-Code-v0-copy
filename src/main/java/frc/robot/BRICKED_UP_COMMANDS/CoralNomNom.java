@@ -1,4 +1,4 @@
-package frc.robot.Commands;
+package frc.robot.BRICKED_UP_COMMANDS;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CoralEater9000;

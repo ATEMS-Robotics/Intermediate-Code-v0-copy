@@ -15,12 +15,9 @@ import frc.robot.subsystems.ElevatorFella;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CoralEater9000;
-import frc.robot.Commands.CoralNomNom;
-import frc.robot.Commands.MoveElevator;
-import frc.robot.Commands.CoralIntestine;
-import frc.robot.Commands.CoralColon;
-import frc.robot.Commands.CoralDigestion;
 import frc.robot.subsystems.CoralPooper;
+import frc.robot.BRICKED_UP_COMMANDS.*;
+import frc.robot.BRICKED_UP_COMMANDS.FancyElevator.MoveAndHoldElevator;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
@@ -41,6 +38,7 @@ public class RobotContainer {
     private final ElevatorFella elevatorSubsystem = new ElevatorFella();
     private final CoralEater9000 coralEater = new CoralEater9000();
     private final CoralPooper coralPooper = new CoralPooper();
+    
 
     public RobotContainer() {
         configureBindings();
@@ -90,13 +88,13 @@ public class RobotContainer {
         driverController.y().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric())); // Resets the Current Direction to be Field-Oriented
         driverController.back().and(driverController.start()).onTrue(new InstantCommand(() -> emergencyStop())); //Stops EVERYTHING when start and back are pressed at the same time.
 
-
+    
         // Elevator Controls
-        driverController.rightBumper().onTrue(new MoveElevator(elevatorSubsystem, -5)); //Vader ten-ish inches
+        driverController.rightBumper().onTrue(new MoveAndHoldElevator(elevatorSubsystem, -5)); //
         driverController.rightBumper().onTrue(Commands.print("Elevator Going Up")); // Debug Print
         driverController.rightBumper().onFalse(new InstantCommand(() -> elevatorSubsystem.stopElevator())); // Safety Stop
 
-        driverController.leftBumper().whileTrue(new MoveElevator(elevatorSubsystem, 0)); // Vader to bottom
+        driverController.leftBumper().onTrue(new MoveAndHoldElevator(elevatorSubsystem, 0)); // Vader to bottom
         driverController.leftBumper().onTrue(Commands.print("Elevator Going Down")); // Debug Print
         driverController.leftBumper().onFalse(new InstantCommand(() -> elevatorSubsystem.stopElevator())); // Safety Stop
 
