@@ -17,7 +17,6 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CoralEater9000;
 import frc.robot.subsystems.CoralPooper;
 import frc.robot.BRICKED_UP_COMMANDS.*;
-import frc.robot.BRICKED_UP_COMMANDS.FancyElevator.MoveAndHoldElevator;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
@@ -90,11 +89,11 @@ public class RobotContainer {
 
     
         // Elevator Controls
-        driverController.rightBumper().onTrue(new MoveAndHoldElevator(elevatorSubsystem, -5)); //
+        driverController.a().onTrue(elevatorSubsystem.moveToPosition(50));
         driverController.rightBumper().onTrue(Commands.print("Elevator Going Up")); // Debug Print
         driverController.rightBumper().onFalse(new InstantCommand(() -> elevatorSubsystem.stopElevator())); // Safety Stop
 
-        driverController.leftBumper().onTrue(new MoveAndHoldElevator(elevatorSubsystem, 0)); // Vader to bottom
+        driverController.b().onTrue(elevatorSubsystem.moveToPosition(100));
         driverController.leftBumper().onTrue(Commands.print("Elevator Going Down")); // Debug Print
         driverController.leftBumper().onFalse(new InstantCommand(() -> elevatorSubsystem.stopElevator())); // Safety Stop
 

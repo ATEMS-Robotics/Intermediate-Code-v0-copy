@@ -25,9 +25,10 @@ public class ElevatorFella extends SubsystemBase {
         elevatorMotor2.setControl(motionMagicControl.withPosition(targetPosition));
     }
 
-    public void stopElevator() {
-        elevatorMotor1.set(0);
-        elevatorMotor2.set(0);
+    public Command[] stopElevator() {
+        elevatorMotor1.setVoltage(-.35);
+        elevatorMotor2.setVoltage(-.35);
+                return null;
     }
 
     public double getCurrentPosition() {
@@ -36,11 +37,24 @@ public class ElevatorFella extends SubsystemBase {
 
     // Move Elevator Command
     public Command moveElevatorCommand(double targetPosition) {
-        return Commands.run(() -> setElevatorPosition(targetPosition), this);
+        return Commands.run(() -> setElevatorPosition(targetPosition));
     }
 
     // Hold Elevator Command
     public Command holdElevatorCommand() {
-        return Commands.run(() -> setElevatorPosition(getCurrentPosition()), this);
+        return Commands.run(() -> setElevatorPosition(getCurrentPosition()));
     }
-}
+    public Command moveToPosition(double targetPosition) {
+        return run(() -> {
+            System.out.println("Moving Elevator: " + elevatorMotor1.getPosition().getValueAsDouble()); // will change to in inches
+            elevatorMotor1.setControl(motionMagicControl.withPosition(targetPosition));
+            elevatorMotor2.setControl(motionMagicControl.withPosition(targetPosition));
+        }).until(() -> Math.abs(getCurrentPosition() - targetPosition) < 1.0)
+          .andThen(stopElevator()); // Stops motors after reaching position
+    }
+    }
+
+
+    //Still need to change to In inches
+    //Tune the PID
+    //Non-lame gravity counteracter maybe
