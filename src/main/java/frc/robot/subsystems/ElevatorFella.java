@@ -25,12 +25,12 @@ public class ElevatorFella extends SubsystemBase {
         elevatorMotor2.setControl(motionMagicControl.withPosition(targetPosition));
     }
 
-    public Command[] stopElevator() {
-        elevatorMotor1.setVoltage(-.35);
-        elevatorMotor2.setVoltage(-.35);
-                return null;
+    public Command stopElevator() {
+        return runOnce(() -> {
+            elevatorMotor1.setVoltage(-.35);
+            elevatorMotor2.setVoltage(-.35);       
+        });
     }
-
     public double getCurrentPosition() {
         return elevatorMotor1.getPosition().getValueAsDouble();
     }
