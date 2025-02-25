@@ -92,23 +92,23 @@ public class RobotContainer {
 
 
         // Elevator Controls
-        driverController.rightBumper().onTrue(new MoveElevator(elevatorSubsystem, 10));
+        driverController.rightBumper().onTrue(new MoveElevator(elevatorSubsystem, -5)); //Vader ten-ish inches
         driverController.rightBumper().onTrue(Commands.print("Elevator Going Up")); // Debug Print
         driverController.rightBumper().onFalse(new InstantCommand(() -> elevatorSubsystem.stopElevator())); // Safety Stop
 
-        driverController.leftBumper().whileTrue(new MoveElevator(elevatorSubsystem, 0)); // Vader Down
+        driverController.leftBumper().whileTrue(new MoveElevator(elevatorSubsystem, 0)); // Vader to bottom
         driverController.leftBumper().onTrue(Commands.print("Elevator Going Down")); // Debug Print
         driverController.leftBumper().onFalse(new InstantCommand(() -> elevatorSubsystem.stopElevator())); // Safety Stop
 
    
         // Coral Arm
-        driverController.povUp().whileTrue(new CoralDigestion(coralEater, () -> 0.2)); // Arm up
+        driverController.povUp().onTrue(new CoralDigestion(coralEater, 0)); // Coral Arm Up
         driverController.povUp().onTrue(Commands.print("Intake Arm Going Up")); // Debug Print
-        driverController.povUp().onFalse(new InstantCommand(() -> coralEater.stopIntakeArm())); // Safety Stop
+        driverController.povUp().onFalse(new InstantCommand(() -> coralEater.stopIntakeArm())); // Safety Stop 
 
-        driverController.povDown().whileTrue(new CoralDigestion(coralEater, () -> -0.2)); // Arm down
+        driverController.povDown().onTrue(new CoralDigestion(coralEater, -5)); // Coral Arm Down
         driverController.povDown().onTrue(Commands.print("Intake Arm Going Down")); // Debug Print
-        driverController.povDown().onFalse(new InstantCommand(() -> coralEater.stopIntakeArm())); // Safety Stop
+        driverController.povDown().onFalse(new InstantCommand(() -> coralEater.stopIntakeArm())); // Safety Stop 
   
 
         // Spin Intake Wheels

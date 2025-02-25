@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+
 public class CoralPooper extends SubsystemBase {
     private final SparkMax coralIntestine; // Takes coral out of intake
     private final SparkMax coralColon; // Scores coral from the elevator
@@ -12,7 +13,8 @@ public class CoralPooper extends SubsystemBase {
         coralIntestine = new SparkMax(24, MotorType.kBrushless); // Replace with actual CAN ID
         coralColon = new SparkMax(25, MotorType.kBrushless); // Replace with actual CAN ID
 
-     
+  
+
     }
 
     /* Spins the Coral Intestine wheel */

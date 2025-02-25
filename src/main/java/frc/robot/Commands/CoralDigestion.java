@@ -1,18 +1,16 @@
 package frc.robot.Commands;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CoralEater9000;
 
 public class CoralDigestion extends Command {
-    private final CoralEater9000 coralEater;
-    private final DoubleSupplier speedSupplier;
+    private final CoralEater9000 arm;
+    private final double targetPosition;
 
-    public CoralDigestion(CoralEater9000 coralEater, DoubleSupplier speedSupplier) {
-        this.coralEater = coralEater;
-        this.speedSupplier = speedSupplier;
-    
+    public CoralDigestion(CoralEater9000 arm, double targetPosition) {
+        this.arm = arm;
+        this.targetPosition = targetPosition;
+        
 
     }
 
@@ -22,16 +20,23 @@ public class CoralDigestion extends Command {
 
     @Override
     public void execute() {
-        double speed = speedSupplier.getAsDouble();
-        coralEater.moveArm(speed);
+        
 
     }
     @Override
     public void initialize() {
+        arm.moveToArmPosition(targetPosition);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return Math.abs(arm.getCurrentPosition() - targetPosition) < 0.1;
     }
 
     @Override
     public void end(boolean interrupted) {
-        coralEater.stopIntakeArm();
+        if (interrupted) {
+            arm.stopIntakeArm();
+        }
     }
 }
