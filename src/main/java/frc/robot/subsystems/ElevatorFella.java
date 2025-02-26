@@ -20,15 +20,15 @@ public class ElevatorFella extends SubsystemBase {
 
         // Motion Magic Configuration
         config.Slot0.kS = 0.1; 
-        config.Slot0.kV = 0.12; 
-        config.Slot0.kA = 0.01; 
-        config.Slot0.kP = 0.2;  
+        config.Slot0.kV = 0.2; 
+        config.Slot0.kA = 0.05; 
+        config.Slot0.kP = 0.4;  
         config.Slot0.kI = 0.0;  
-        config.Slot0.kD = 0.2;  
+        config.Slot0.kD = 0.3;  
         config.Slot0.kG = 1.6775;  
 
-        config.MotionMagic.MotionMagicCruiseVelocity = 160;
-        config.MotionMagic.MotionMagicAcceleration = 160;
+        config.MotionMagic.MotionMagicCruiseVelocity = 320;
+        config.MotionMagic.MotionMagicAcceleration = 300;
         config.MotionMagic.MotionMagicJerk = 400;
 
         elevatorMotor1.setNeutralMode(NeutralModeValue.Brake);
