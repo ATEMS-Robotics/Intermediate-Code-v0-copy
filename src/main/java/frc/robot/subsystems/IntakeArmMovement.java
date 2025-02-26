@@ -14,9 +14,8 @@ public class IntakeArmMovement extends SubsystemBase {
     private final TalonFX armMotor; 
     private final TalonFXConfiguration config = new TalonFXConfiguration();
     private final MotionMagicVoltage motionMagic = new MotionMagicVoltage(0);
-    private final double kG = 0.5; // Gravity compensation (TUNE THIS VALUE), very important
-    private final double maxVoltage = 6.0; // Max allowable voltage
-    private final double minVoltage = 1.0; // Min holding voltage
+   // private final double maxVoltage = 6.0; // Max allowable voltage
+   // private final double minVoltage = 1.0; // Min holding voltage
 
     public IntakeArmMovement() {
         armMotor = new TalonFX(23, "rio");  
@@ -52,21 +51,18 @@ public class IntakeArmMovement extends SubsystemBase {
         return run(() -> armMotor.setControl(motionMagic.withPosition(targetArmPosition)));
     }
     
-      /** Converts encoder position to arm angle (TUNE this for your encoder setup) */
-      private double getArmAngle() {
-        return getCurrentPosition() * 360.0 / 2048.0; // Adjust based on gear ratio & encoder units
-    }
+      
     
-       /** Gravity Compensation Hold Mode */
+    /* 
        public void holdPosition() {
         double angle = getArmAngle(); // Implement this based on encoder values
-        double holdVoltage = kG * Math.cos(Math.toDegrees(angle));
+        double holdVoltage = kG * Math.cos(Math.toDegrees(angle)); 
 
         // Clamp voltage between min and max
         holdVoltage = Math.max(minVoltage, Math.min(holdVoltage, maxVoltage));
 
         armMotor.setVoltage(holdVoltage);
-    }
+    } */
 
 
 }
