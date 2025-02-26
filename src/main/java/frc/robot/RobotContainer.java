@@ -64,8 +64,8 @@ public class RobotContainer {
             )
         );
 
-        driverController.x().whileTrue(drivetrain.applyRequest(() -> brake));
-        driverController.y().whileTrue(drivetrain.applyRequest(() ->
+        //driverController.x().whileTrue(drivetrain.applyRequest(() -> brake));
+        driverController.y().and(driverController.back()).whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-driverController.getLeftY(), -driverController.getLeftX()))
         ));
 
@@ -101,19 +101,21 @@ public class RobotContainer {
         driverController.rightTrigger().onTrue(Commands.print("Elevator Go To 0")); // Debug Print
         driverController.rightTrigger().onFalse(new InstantCommand(() -> elevatorSubsystem.stopElevator())); // Safety Stop
 
-   
+       
         // Coral Arm
-        driverController.povUp().onTrue(coralEater.moveToArmPosition(0)); // Coral Arm Up
+        driverController.povUp().onTrue(coralEater.moveToArmPosition(-10)); // Coral Arm Up
         driverController.povUp().onTrue(Commands.print("Intake Arm Go Bottom")); // Debug Print
         //driverController.povUp().onFalse(new InstantCommand(() -> coralEater.stopIntakeArm())); // Safety Stop 
+        
 
-        driverController.povDown().onTrue(coralEater.moveToArmPosition(30)); // Coral Arm Up
+        driverController.povDown().onTrue(coralEater.moveToArmPosition(-6)); // Coral Arm Up
         driverController.povDown().onTrue(Commands.print("Intake Arm Go Mid")); // Debug Print
         //driverController.povDown().onFalse(new InstantCommand(() -> coralEater.stopIntakeArm())); // Safety Stop
         
-        //driverController.y().onTrue(coralEater.moveToArmPosition(100)); // Coral Arm Up
-        //driverController.y().onTrue(Commands.print("Intake Arm Go Up")); // Debug Print
+        driverController.y().onTrue(coralEater.moveToArmPosition(-1)); // Coral Arm Up
+        driverController.y().onTrue(Commands.print("Intake Arm Go Up")); // Debug Print
         //driverController.y().onFalse(new InstantCommand(() -> coralEater.stopIntakeArm())); // Safety Stop 
+
   
 
         // Spin Intake Wheels

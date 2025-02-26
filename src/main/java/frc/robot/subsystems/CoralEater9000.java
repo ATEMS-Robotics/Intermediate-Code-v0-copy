@@ -1,42 +1,45 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.ctre.phoenix6.hardware.TalonFX; // Kraken X60 motors use TalonFX
-import com.ctre.phoenix6.controls.*; // Needed for motor control modes
-import com.ctre.phoenix6.signals.NeutralModeValue; // Needed for setting motor neutral mode
-import com.ctre.phoenix6.configs.TalonFXConfiguration; // Needed for setting motor configurations
+import edu.wpi.first.wpilibj2.command.Command;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+
+
 
 public class CoralEater9000 extends SubsystemBase {
-    private final TalonFX armMotor; // Rotates the whole arm
-    private final TalonFX intakeMotor; // Spins Omni wheels for intake
-    private final TalonFXConfiguration config = new TalonFXConfiguration(); // Motor configuration for arm
-    private final MotionMagicVoltage MotionMagic = new MotionMagicVoltage(0); // Motion Magic control mode for arm
-    private double armHeldPosition = 0; // Initial position of arm 
+    private final TalonFX armMotor; 
+    private final TalonFX intakeMotor; 
+    private final TalonFXConfiguration config = new TalonFXConfiguration();
+    private final MotionMagicVoltage motionMagic = new MotionMagicVoltage(0);
     private final double kG = 0.5; // Gravity compensation (TUNE THIS VALUE), very important
     private final double maxVoltage = 6.0; // Max allowable voltage
     private final double minVoltage = 1.0; // Min holding voltage
 
     public CoralEater9000() {
-        armMotor = new TalonFX(23, "rio");  // Replace with actual CAN ID
-        intakeMotor = new TalonFX(22, "rio");  // Replace with actual CAN ID 
-        armMotor.setNeutralMode(NeutralModeValue.Brake); // Set arm motor to brake mode
+        armMotor = new TalonFX(23, "rio");  
+        intakeMotor = new TalonFX(22, "rio");  
 
-        // Magic Motion Configuration
-        config.Slot0.kS = 0.1; // Static friction compensation (TUNE), not needed to be maximum precision
-        config.Slot0.kV = 0.12; // Velocity feedforward (TUNE), adjust as needed
-        config.Slot0.kA = 0.01; // Acceleration feedforward (TUNE), adjust as needed
-        config.Slot0.kP = 0.2;  // Proportional gain (TUNE), corrects errors, increase till is quick, but not overshooting
-        config.Slot0.kI = 0.0;  // Integral gain (leave 0 unless needed)
-        config.Slot0.kD = 0.01;  // Derivative gain (TUNE), fixes overshooting
-        config.Slot0.kG = kG;  // Gravity compensation (TUNE), gravity, value is changed up above
+        armMotor.setNeutralMode(NeutralModeValue.Brake);
 
-        // Motion Magic settings
-        config.MotionMagic.MotionMagicCruiseVelocity = 40; // Max velocity (TUNE)
-        config.MotionMagic.MotionMagicAcceleration = 80;  // Acceleration (TUNE)
-        config.MotionMagic.MotionMagicJerk = 400;  // Smoother motion
+        
 
-        // Apply configuration to motors
+        // Motion Magic Configuration
+        config.Slot0.kS = 0.1; 
+        config.Slot0.kV = 0.12; 
+        config.Slot0.kA = 0.01; 
+        config.Slot0.kP = 0.05;  
+        config.Slot0.kI = 0.0;  
+        config.Slot0.kD = 0.1;  
+        config.Slot0.kG = 1.6775;  
+
+        config.MotionMagic.MotionMagicCruiseVelocity = 40;
+        config.MotionMagic.MotionMagicAcceleration = 80;
+        config.MotionMagic.MotionMagicJerk = 400;
+
         armMotor.getConfigurator().apply(config);
     }
 
@@ -44,9 +47,17 @@ public class CoralEater9000 extends SubsystemBase {
     public double getCurrentPosition() {
         return armMotor.getPosition().getValueAsDouble();
     }
+    
 
-     /** Converts encoder position to arm angle (TUNE this for your encoder setup) */
-     private double getArmAngle() {
+    /** Moves arm to a specific position and auto-holds */
+    public Command moveToArmPosition(double targetArmPosition) {
+        return run(() -> armMotor.setControl(motionMagic.withPosition(targetArmPosition)));
+    
+    }
+
+    
+      /** Converts encoder position to arm angle (TUNE this for your encoder setup) */
+      private double getArmAngle() {
         return getCurrentPosition() * 360.0 / 2048.0; // Adjust based on gear ratio & encoder units
     }
     
@@ -61,48 +72,15 @@ public class CoralEater9000 extends SubsystemBase {
         armMotor.setVoltage(holdVoltage);
     }
 
-    /** Moves arm to a specific position using Motion Magic */
-    public Command moveToArmPosition(double targetArmPosition) {
-       return runOnce(() -> {
-        armMotor.setControl(MotionMagic.withPosition(targetArmPosition));
-        armHeldPosition = targetArmPosition;
- 
-       }).andThen(run(() -> holdPosition()));
-        
-    }
-
-    public Command holdArmCommand() {
-        return run(() -> holdPosition());
-    }
-
-    /** Spins the intake wheels. Positive = intake, Negative = outtake */
+    /** Spins the intake wheels */
     public Command spinIntakeCommand(double speed) {
         return run(() -> intakeMotor.setControl(new DutyCycleOut(speed)));
     }
 
-    /** Stops all motors */
-    public void stopCoralEating() {
-        armMotor.set(0);
-        intakeMotor.setControl(new DutyCycleOut(0));
-    }
-
-    //Add stop command for intake arm
-    /** Stops intake spinning */
+    /** Stops the intake */
     public Command stopIntakeSpinning() {
-       return runOnce(() -> intakeMotor.setControl(new DutyCycleOut(0)));
+        return runOnce(() -> intakeMotor.setControl(new DutyCycleOut(0)));
     }
 
- 
-
-   
-
-    @Override
-    public void periodic() {
-        // This method will be called once per scheduler run
-        if (armMotor.getVelocity().getValueAsDouble() < 0.) { // If near stationary, hold position
-            holdPosition();
-        } else {
-            armMotor.setControl(MotionMagic.withPosition(armHeldPosition));
-        }
-    }
 }
+
