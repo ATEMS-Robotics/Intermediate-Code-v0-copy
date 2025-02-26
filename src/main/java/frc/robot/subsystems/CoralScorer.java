@@ -7,12 +7,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 
-public class CoralPooper extends SubsystemBase {
-    private final SparkMax coralIntestine; // Takes coral out of intake
-    private final SparkMax coralColon; // Scores coral from the elevator
+public class CoralScorer extends SubsystemBase {
+    private final SparkMax coralColon; // Takes coral out of intake
 
-    public CoralPooper() {
-        coralIntestine = new SparkMax(24, MotorType.kBrushless); // Replace with actual CAN ID
+    public CoralScorer() {
         coralColon = new SparkMax(25, MotorType.kBrushless); // Replace with actual CAN ID
         SparkMaxConfig coralColonConfig = new SparkMaxConfig();
 
@@ -22,27 +20,18 @@ public class CoralPooper extends SubsystemBase {
     }
 
     /* Spins the Coral Intestine wheel */
-    public void setIntestineSpeed(double speed) {
-        coralIntestine.set(speed);
-    }
-
-    /* Spins the Coral Colon wheel */
     public void setColonSpeed(double speed) {
         coralColon.set(speed);
     }
 
-    /* Stops Intestine Wheel */
-    public void stopIntestine() {
-        coralIntestine.set(0);
-    }
 
-    /* Stops Colon Wheel */
+    /* Stops Intestine Wheel */
     public void stopColon() {
         coralColon.set(0);
     }
 
+
     public void stopCoralPooping() {
         coralColon.set(0);
-        coralIntestine.set(0);
     }
 }

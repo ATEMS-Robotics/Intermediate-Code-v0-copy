@@ -12,11 +12,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.ElevatorFella;
+import frc.robot.COMMANDS.*;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.CoralEater9000;
-import frc.robot.subsystems.CoralPooper;
-import frc.robot.BRICKED_UP_COMMANDS.*;
+import frc.robot.subsystems.IntakeArmMovement;
+import frc.robot.subsystems.CoralScorer;
+import frc.robot.subsystems.CoralTransfer;
+import frc.robot.subsystems.WheelIntake;
+
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
@@ -25,7 +28,7 @@ public class RobotContainer {
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-    
+    @SuppressWarnings ("unused")
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
@@ -35,24 +38,25 @@ public class RobotContainer {
 
     // Subsystems
     private final ElevatorFella elevatorSubsystem = new ElevatorFella();
-    private final CoralEater9000 coralEater = new CoralEater9000();
-    private final CoralPooper coralPooper = new CoralPooper();
+    private final IntakeArmMovement armMover = new IntakeArmMovement();
+    private final WheelIntake IntakeWheelMover = new WheelIntake();
+    private final CoralScorer coralScoring = new CoralScorer();
+    private final CoralTransfer coralToScoring = new CoralTransfer();
     
 
     public RobotContainer() {
         configureBindings();
     }
 
-    private void emergencyStop() { // Full stop code that stops everything.
+    /*private void emergencyStop() { // Full stop code that stops everything.
         elevatorSubsystem.stopElevator();
-        //coralEater.stopIntakeArm();
-        coralEater.stopIntakeSpinning();
-        coralPooper.stopIntestine();
+        //armMover.stopIntakeArm();
+        IntakeWheelMover.stopIntakeSpinning();
+        //coralPooper.stopIntestine();
         coralPooper.stopColon();
         drivetrain.applyRequest(() -> brake); 
         System.out.println("🚨 Emergency Stop Activated! 🚨");
-    }
-
+    } */
     private final boolean enableSysId = false; // Set to true for testing, false for competition, enables testing code
 
     private void configureBindings() {
@@ -85,7 +89,7 @@ public class RobotContainer {
 
         //CONTROLS
         driverController.y().and(driverController.start()).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric())); // Resets the Current Direction to be Field-Oriented
-        driverController.back().and(driverController.start()).onTrue(new InstantCommand(() -> emergencyStop())); //Stops EVERYTHING when start and back are pressed at the same time.
+        //driverController.back().and(driverController.start()).onTrue(new InstantCommand(() -> emergencyStop())); //Stops EVERYTHING when start and back are pressed at the same time.
 
     
         // Elevator Controls
@@ -103,43 +107,43 @@ public class RobotContainer {
 
        
         // Coral Arm
-        driverController.povUp().onTrue(coralEater.moveToArmPosition(-10)); // Coral Arm Up
+        driverController.povUp().onTrue(armMover.moveToArmPosition(-10)); // Coral Arm Up
         driverController.povUp().onTrue(Commands.print("Intake Arm Go Bottom")); // Debug Print
         //driverController.povUp().onFalse(new InstantCommand(() -> coralEater.stopIntakeArm())); // Safety Stop 
         
 
-        driverController.povDown().onTrue(coralEater.moveToArmPosition(-6)); // Coral Arm Up
+        driverController.povDown().onTrue(armMover.moveToArmPosition(-6)); // Coral Arm Up
         driverController.povDown().onTrue(Commands.print("Intake Arm Go Mid")); // Debug Print
         //driverController.povDown().onFalse(new InstantCommand(() -> coralEater.stopIntakeArm())); // Safety Stop
         
-        driverController.y().onTrue(coralEater.moveToArmPosition(-1)); // Coral Arm Up
+        driverController.y().onTrue(armMover.moveToArmPosition(-1)); // Coral Arm Up
         driverController.y().onTrue(Commands.print("Intake Arm Go Up")); // Debug Print
         //driverController.y().onFalse(new InstantCommand(() -> coralEater.stopIntakeArm())); // Safety Stop 
 
   
 
         // Spin Intake Wheels
-        driverController.b().whileTrue((coralEater.spinIntakeCommand(0.3))); // Coral go out
+        driverController.b().whileTrue((IntakeWheelMover.spinIntakeCommand(0.3))); // Coral go out
         driverController.b().onTrue(Commands.print("Coral go out")); // Debug Print
-        driverController.b().onFalse(new InstantCommand(() -> coralEater.stopIntakeSpinning())); // Safety Stop
+        driverController.b().onFalse(new InstantCommand(() -> IntakeWheelMover.stopIntakeSpinning())); // Safety Stop
 
-        driverController.a().whileTrue((coralEater.spinIntakeCommand(-0.3))); // Coral go out
+        driverController.a().whileTrue((IntakeWheelMover.spinIntakeCommand(-0.3))); // Coral go out
         driverController.a().onTrue(Commands.print("Coral go in")); // Debug Print
-        driverController.a().onFalse(new InstantCommand(() -> coralEater.stopIntakeSpinning())); // Safety Stop
+        driverController.a().onFalse(new InstantCommand(() -> IntakeWheelMover.stopIntakeSpinning())); // Safety Stop
 
 
         // Coral Scoring System
-        driverController.leftTrigger().whileTrue(new CoralIntestine(coralPooper, -0.2  )); // Coral Intestine (Removes coral from intake)
+        driverController.leftTrigger().whileTrue(new CoralIntestine(coralToScoring, -0.2  )); // Coral Intestine (Removes coral from intake)
         driverController.leftTrigger().onTrue(Commands.print("Removing Coral From Intake")); // Debug Print
-        driverController.leftTrigger().onFalse(new InstantCommand(() -> coralPooper.stopIntestine())); // Safety Stop
+        driverController.leftTrigger().onFalse(new InstantCommand(() -> coralToScoring.stopIntestine())); // Safety Stop
 
-        driverController.povLeft().whileTrue(new CoralColon(coralPooper, 0.1)); // Coral Colon (Moves it towards intake)
+        driverController.povLeft().whileTrue(new CoralColon(coralScoring, 0.1)); // Coral Colon (Moves it towards intake)
         driverController.povLeft().onTrue(Commands.print("Coral Colon Moving Back, In to Robot")); // Debug Print
-        driverController.povLeft().onFalse(new InstantCommand(() -> coralPooper.stopColon())); // Safety Stop
+        driverController.povLeft().onFalse(new InstantCommand(() -> coralScoring.stopColon())); // Safety Stop
 
-        driverController.povRight().whileTrue(new CoralColon(coralPooper, -0.1)); // Coral Colon (Moves coral out of robot to elevator)
+        driverController.povRight().whileTrue(new CoralColon(coralScoring, -0.1)); // Coral Colon (Moves coral out of robot to elevator)
         driverController.povRight().onTrue(Commands.print("Coral Colon Moving Forward, Out of Robot")); // Debug Print
-        driverController.povRight().onFalse(new InstantCommand(() -> coralPooper.stopColon())); // Safety Stop
+        driverController.povRight().onFalse(new InstantCommand(() -> coralScoring.stopColon())); // Safety Stop
     }   
 
 

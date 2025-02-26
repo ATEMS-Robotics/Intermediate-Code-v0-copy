@@ -1,13 +1,13 @@
-package frc.robot.BRICKED_UP_COMMANDS;
+package frc.robot.COMMANDS;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.CoralPooper;
+import frc.robot.subsystems.CoralScorer;
 
 public class CoralColon extends Command {
-    private final CoralPooper outtake;
+    private final CoralScorer outtake;
     private final double speed;
 
-    public CoralColon(CoralPooper outtake, double speed) {
+    public CoralColon(CoralScorer outtake, double speed) {
         this.outtake = outtake;
         this.speed = speed;
     }
