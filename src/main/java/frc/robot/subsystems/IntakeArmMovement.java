@@ -7,8 +7,9 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import java.util.function.DoubleSupplier;
 
+//import java.util.function.DoubleSupplier;
+//import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 //import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -18,19 +19,12 @@ import edu.wpi.first.wpilibj.DigitalInput;
 
 public class IntakeArmMovement extends SubsystemBase {
     private final TalonFX armMotor; 
-    private static final double MOTOR_ROTATIONS_TO_ARM_ROTATIONS = 8.4;
-    private static final double TICKS_PER_REVOLUTION_OF_MOTOR = 2048.0;
 
     private final DigitalInput armLimitSwitch;
     private final TalonFXConfiguration config = new TalonFXConfiguration();
     private final MotionMagicVoltage motionMagic = new MotionMagicVoltage(0);
-    //private final double maxVoltage = 6.0; // Max allowable voltage
-    //private final double minVoltage = 1.0; // Min holding voltage
-    /*private static final double TOP_POSITION = 0;
-    private static final double SLOW_ZONE = -1;
-    private static final double NORMAL_SPEED = 0.2;
-    private static final double SLOW_SPEED = 0.08;*/
 
+   
     public IntakeArmMovement() {
         armMotor = new TalonFX(23, "rio"); 
         armLimitSwitch = new DigitalInput(0);
@@ -50,6 +44,7 @@ public class IntakeArmMovement extends SubsystemBase {
         config.MotionMagic.MotionMagicCruiseVelocity = 80;
         config.MotionMagic.MotionMagicAcceleration = 80;
         config.MotionMagic.MotionMagicJerk = 400;
+        config.Feedback.SensorToMechanismRatio = 8.4;
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
         armMotor.getConfigurator().apply(config); 
@@ -61,21 +56,17 @@ public class IntakeArmMovement extends SubsystemBase {
     
     
     //Moves arm to a specific position and auto-holds 
-    public Command moveToArmPosition(DoubleSupplier targetAngleSupplier) {
+    public Command moveToArmPosition(double targetAngle) {
+
         return run(() -> {
-       double targetAngle = targetAngleSupplier.getAsDouble();
-       double targetRotations = (targetAngle / 360) * MOTOR_ROTATIONS_TO_ARM_ROTATIONS;
-       double targetTicks = targetRotations * TICKS_PER_REVOLUTION_OF_MOTOR;
-
         System.out.println("Moving to Position:" + targetAngle + "degrees");
-        armMotor.setControl(motionMagic.withPosition(targetTicks));
+        armMotor.setControl(motionMagic.withPosition(targetAngle));
 
-    }).until(() -> Math.abs(getCurrentAngle() - targetAngleSupplier.getAsDouble()) < 2.0); }
+    }).until(() -> Math.abs(getCurrentAngle() - targetAngle) < 2.0); }
   
 
     private double getCurrentAngle() {
-        double motorRotations = armMotor.getPosition().getValueAsDouble() / TICKS_PER_REVOLUTION_OF_MOTOR;
-        return (motorRotations / MOTOR_ROTATIONS_TO_ARM_ROTATIONS) * 360;
+        return armMotor.getPosition().getValueAsDouble();
     }
 
     //public Command stopArm() {
