@@ -107,16 +107,16 @@ public class RobotContainer {
 
        
         // Coral Arm
-        driverController.povUp().onTrue(armMover.moveToArmPosition(0)); // Coral Arm Up
+        driverController.povUp().onTrue(armMover.moveToArmPosition(() -> 0)); // Coral Arm Up
         driverController.povUp().onTrue(Commands.print("Intake Arm Go 0")); // Debug Print
-        driverController.povUp().onFalse(armMover.stopArm());
+        //driverController.povUp().onFalse(armMover.stopArm());
         
 
-        driverController.povDown().onTrue(armMover.moveToArmPosition(-.8)); // Coral Arm Up
+        driverController.povDown().onTrue(armMover.moveToArmPosition(() -> -.8)); // Coral Arm Up
         driverController.povDown().onTrue(Commands.print("Intake Arm Go 1")); // Debug Print
        // driverController.povDown().onFalse(armMover.stopArm());
         
-        driverController.y().onTrue(armMover.moveToArmPosition(-1)); // Coral Arm Up
+        driverController.y().onTrue(armMover.moveToArmPosition(() -> -1)); // Coral Arm Up
         driverController.y().onTrue(Commands.print("Intake Arm Go -1")); // Debug Print
         // driverController.y().onFalse(coralScoring.// Safety Stop 
 

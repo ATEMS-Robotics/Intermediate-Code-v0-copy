@@ -6,6 +6,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 //import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -15,6 +18,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 
 public class IntakeArmMovement extends SubsystemBase {
     private final TalonFX armMotor; 
+    private static final double MOTOR_ROTATIONS_TO_ARM_ROTATIONS = 8.4;
+    private static final double TICKS_PER_REVOLUTION_OF_MOTOR = 2048.0;
 
     private final DigitalInput armLimitSwitch;
     private final TalonFXConfiguration config = new TalonFXConfiguration();
@@ -25,7 +30,6 @@ public class IntakeArmMovement extends SubsystemBase {
     private static final double SLOW_ZONE = -1;
     private static final double NORMAL_SPEED = 0.2;
     private static final double SLOW_SPEED = 0.08;*/
-    //private static final double MOTOR_ROTATIONS_TO_ARM_ROTATIONS = 1.0/8.4;
 
     public IntakeArmMovement() {
         armMotor = new TalonFX(23, "rio"); 
@@ -49,74 +53,35 @@ public class IntakeArmMovement extends SubsystemBase {
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
         armMotor.getConfigurator().apply(config); 
+        
     }
 
-    /*public double getArmRotations() {
-        return armMotor.getPosition().getValueAsDouble() * MOTOR_ROTATIONS_TO_ARM_ROTATIONS;
-    }
-
-    public double ArmDegrees() {
-        return getArmRotations() * 360;
-    }*/
-
+    
+        
     
     
     //Moves arm to a specific position and auto-holds 
-    public Command moveToArmPosition(double targetArmPosition) {
-        //double currentPosition = armMotor.getPosition().getValueAsDouble();
-        double calculatedArmPosition = targetArmPosition / 1000000;
-            //double finalArmPosition = (calculatedArmPosition > currentPosition) ? (currentPosition - 0.1) : calculatedArmPosition;     
-            double finalArmPosition = Math.min(calculatedArmPosition, 0.1);
-        //final double lastPositon = finalArmPosition;
-        
+    public Command moveToArmPosition(DoubleSupplier targetAngleSupplier) {
         return run(() -> {
-        System.out.println("Moving to Position:" + finalArmPosition);
-        armMotor.setControl(motionMagic.withPosition(finalArmPosition));
-    }); }
+       double targetAngle = targetAngleSupplier.getAsDouble();
+       double targetRotations = (targetAngle / 360) * MOTOR_ROTATIONS_TO_ARM_ROTATIONS;
+       double targetTicks = targetRotations * TICKS_PER_REVOLUTION_OF_MOTOR;
+
+        System.out.println("Moving to Position:" + targetAngle + "degrees");
+        armMotor.setControl(motionMagic.withPosition(targetTicks));
+
+    }).until(() -> Math.abs(getCurrentAngle() - targetAngleSupplier.getAsDouble()) < 2.0); }
   
-      
-    
-    
-       /*public void holdPosition() {
-        double angle = getArmAngle(); // Implement this based on encoder values
-        double holdVoltage = kG * Math.cos(Math.toDegrees(angle)); 
 
-        // Clamp voltage between min and max
-        holdVoltage = Math.max(minVoltage, Math.min(holdVoltage, maxVoltage));
-
-        armMotor.setVoltage(holdVoltage);
-    } */
-    
-        /*public Command moveArmUp() {
-        return run(() -> {
-          
-            double position = armMotor.getPosition().getValueAsDouble();
-            if(position >= TOP_POSITION) {
-                armMotor.setVoltage(2);
-            } else {   
-            //double distanceToTop = Math.max(1, (TOP_POSITION - position)); MAYBE MAKE THIS TO SCALE SPEEDa
-            double speed = (position >= SLOW_ZONE) ? SLOW_SPEED : NORMAL_SPEED; 
-            armMotor.setControl(new DutyCycleOut(speed));
-            }
-
-        });
+    private double getCurrentAngle() {
+        double motorRotations = armMotor.getPosition().getValueAsDouble() / TICKS_PER_REVOLUTION_OF_MOTOR;
+        return (motorRotations / MOTOR_ROTATIONS_TO_ARM_ROTATIONS) * 360;
     }
 
-    public Command moveArmDown(){
-        return run(() -> armMotor.setControl(new DutyCycleOut(-SLOW_SPEED)));
-    } */
+    //public Command stopArm() {
+     //   return runOnce(() -> armMotor.setPosition(-1));
+    //}
 
-    public Command stopArm() {
-        return runOnce(() -> armMotor.setPosition(-1));
-    }
-/*
-    public Command noodleSquisher(){
-        return run(() -> armMotor.setVoltage(2));
-    }
-    /* Returns current arm position (encoder units) 
-    public double getCurrentPosition() {
-        return armMotor.getPosition().getValueAsDouble(); 
-    } */
     @Override
     public void periodic() {
         if (!armLimitSwitch.get()) {
