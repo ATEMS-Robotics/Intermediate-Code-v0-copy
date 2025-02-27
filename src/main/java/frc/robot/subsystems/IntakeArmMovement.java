@@ -7,6 +7,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+
 //import com.ctre.phoenix6.controls.DutyCycleOut;
 import edu.wpi.first.wpilibj.DigitalInput;
 
@@ -60,12 +61,19 @@ public class IntakeArmMovement extends SubsystemBase {
 
     
     
-
     //Moves arm to a specific position and auto-holds 
     public Command moveToArmPosition(double targetArmPosition) {
-        return run(() -> armMotor.setControl(motionMagic.withPosition(targetArmPosition)));
-    } 
-
+        //double currentPosition = armMotor.getPosition().getValueAsDouble();
+        double calculatedArmPosition = targetArmPosition / 1000000;
+            //double finalArmPosition = (calculatedArmPosition > currentPosition) ? (currentPosition - 0.1) : calculatedArmPosition;     
+            double finalArmPosition = Math.min(calculatedArmPosition, 0.1);
+        //final double lastPositon = finalArmPosition;
+        
+        return run(() -> {
+        System.out.println("Moving to Position:" + finalArmPosition);
+        armMotor.setControl(motionMagic.withPosition(finalArmPosition));
+    }); }
+  
       
     
     
@@ -96,12 +104,12 @@ public class IntakeArmMovement extends SubsystemBase {
 
     public Command moveArmDown(){
         return run(() -> armMotor.setControl(new DutyCycleOut(-SLOW_SPEED)));
-    }
+    } */
 
     public Command stopArm() {
-        return runOnce(() -> armMotor.setControl(new DutyCycleOut(0)));
+        return runOnce(() -> armMotor.setPosition(-1));
     }
-
+/*
     public Command noodleSquisher(){
         return run(() -> armMotor.setVoltage(2));
     }
@@ -113,7 +121,7 @@ public class IntakeArmMovement extends SubsystemBase {
     public void periodic() {
         if (!armLimitSwitch.get()) {
             System.out.println("My Dylon Is the Best");
-            System.out.println("Arm Position: " + armMotor.getPosition().getValueAsDouble());
+            System.out.println("Arm Position: " + armMotor.getPosition().getValueAsDouble()); 
             //System.out.println("Arm Degrees:" +ArmDegrees());
         }
     }
