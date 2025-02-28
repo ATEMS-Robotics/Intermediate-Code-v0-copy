@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -18,17 +19,15 @@ public class CoralTransfer extends SubsystemBase {
   
     }
 
-    /* Spins the Coral Intestine wheel */
-    public void setIntestineSpeed(double speed) {
-        coralIntestine.set(speed);
+    public Command spinIntestine(double speed) {
+        return run(() -> coralIntestine.set((speed)));
     }
 
-    /* Stops Intestine Wheel */
-    public void stopIntestine() {
-        coralIntestine.set(0);
+
+   /** Stops the intake */
+    public Command stopIntestine() {
+        return runOnce(() -> coralIntestine.set(0));
     }
 
-    public void stopCoralPooping() {
-        coralIntestine.set(0);
-    }
+
 }

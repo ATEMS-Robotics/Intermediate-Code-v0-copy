@@ -7,10 +7,14 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
+  CommandSwerveDrivetrain swerve = TunerConstants.createDrivetrain();
 
+  @SuppressWarnings("unused")
   private final RobotContainer m_robotContainer;
  
 
@@ -18,6 +22,9 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
   }
   
+public void robotInit() {
+  CommandSwerveDrivetrain.configureAutoBuilder();
+}
 
   @Override
   public void robotPeriodic() {
@@ -35,7 +42,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+   m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();

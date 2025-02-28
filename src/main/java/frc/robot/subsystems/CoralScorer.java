@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.spark.SparkMax;
@@ -26,21 +27,18 @@ public class CoralScorer extends SubsystemBase {
         
     }
 
-    /* Spins the Coral Intestine wheel */
-    public void setColonSpeed(double speed) {
-        coralColon.set(speed);
+    public Command spinColon(double speed) {
+        return run(() -> coralColon.set((speed)));
     }
 
 
-    /* Stops Intestine Wheel */
-    public void stopColon() {
-        coralColon.set(0);
+
+    /** Stops the intake */
+    public Command stopColon() {
+        return runOnce(() -> coralColon.set(0));
     }
 
 
-    public void stopCoralPooping() {
-        coralColon.set(0);
-    }
 
    
 

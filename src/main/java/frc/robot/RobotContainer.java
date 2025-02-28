@@ -4,37 +4,46 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.ElevatorFella;
-import frc.robot.COMMANDS.*;
+import frc.robot.COMMANDS.AutoIntestineSchmoovement;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeArmMovement;
 import frc.robot.subsystems.CoralScorer;
 import frc.robot.subsystems.CoralTransfer;
 import frc.robot.subsystems.WheelIntake;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
+
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
     @SuppressWarnings ("unused")
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+    //private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
-    private final CommandXboxController driverController = new CommandXboxController(0); // ✅ Using only one controller now
+    private final CommandXboxController driverController = new CommandXboxController(0); 
+    private final CommandGenericHID safetyController = new CommandGenericHID(1);
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    private final DigitalInput armLimitSwitch;
 
     // Subsystems
     private final ElevatorFella elevatorSubsystem = new ElevatorFella();
@@ -43,20 +52,20 @@ public class RobotContainer {
     private final CoralScorer coralScoring = new CoralScorer();
     private final CoralTransfer coralToScoring = new CoralTransfer();
     
+    private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
+        
+        autoChooser = AutoBuilder.buildAutoChooser("driveBack");
+        autoChooser.setDefaultOption("Drive Back", AutoBuilder.buildAuto("driveBack"));
+        SmartDashboard.putData("Auto Mode", autoChooser);
+
         configureBindings();
+        armLimitSwitch = new DigitalInput(0);
+
     }
 
-    /*private void emergencyStop() { // Full stop code that stops everything.
-        elevatorSubsystem.stopElevator();
-        //armMover.stopIntakeArm();
-        IntakeWheelMover.stopIntakeSpinning();
-        //coralPooper.stopIntestine();
-        coralPooper.stopColon();
-        drivetrain.applyRequest(() -> brake); 
-        System.out.println("🚨 Emergency Stop Activated! 🚨");
-    } */
+
     private final boolean enableSysId = false; // Set to true for testing, false for competition, enables testing code
 
     private void configureBindings() {
@@ -69,9 +78,9 @@ public class RobotContainer {
         );
 
         //driverController.x().whileTrue(drivetrain.applyRequest(() -> brake));
-        driverController.y().and(driverController.back()).whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-driverController.getLeftY(), -driverController.getLeftX()))
-        ));
+       // driverController.y().and(driverController.back()).whileTrue(drivetrain.applyRequest(() ->
+        //    point.withModuleDirection(new Rotation2d(-driverController.getLeftY(), -driverController.getLeftX()))
+        //));
 
 
         
@@ -89,7 +98,6 @@ public class RobotContainer {
 
         //CONTROLS
         driverController.y().and(driverController.start()).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric())); // Resets the Current Direction to be Field-Oriented
-        //driverController.back().and(driverController.start()).onTrue(new InstantCommand(() -> emergencyStop())); //Stops EVERYTHING when start and back are pressed at the same time.
 
     
         // Elevator Controls
@@ -107,20 +115,18 @@ public class RobotContainer {
 
        
         // Coral Arm
-        driverController.povUp().onTrue(armMover.moveToArmPosition(0)); // Coral Arm Up
+        driverController.povUp().onTrue(armMover.moveToArmPosition(5)); // Coral Arm Up
         driverController.povUp().onTrue(Commands.print("Intake Arm Go 0")); // Debug Print
-        //driverController.povUp().onFalse(armMover.stopArm());
         
 
-        driverController.povDown().onTrue(armMover.moveToArmPosition(-.8)); // Coral Arm Up
+        driverController.povDown().onTrue(armMover.moveToArmPosition(-1.5)); // Coral Arm Up
         driverController.povDown().onTrue(Commands.print("Intake Arm Go 1")); // Debug Print
-       // driverController.povDown().onFalse(armMover.stopArm());
         
-        driverController.y().onTrue(armMover.moveToArmPosition(-1)); // Coral Arm Up
+        driverController.y().onTrue(armMover.moveToArmPosition(1)); // Coral Arm Up
         driverController.y().onTrue(Commands.print("Intake Arm Go -1")); // Debug Print
-        // driverController.y().onFalse(coralScoring.// Safety Stop 
 
-  
+        safetyController.button(0).onTrue(armMover.printArmRotations());
+
 
         // Spin Intake Wheels
         driverController.b().whileTrue((IntakeWheelMover.spinIntakeCommand(0.3))); // Coral go out
@@ -133,21 +139,27 @@ public class RobotContainer {
 
 
         // Coral Scoring System
-        driverController.leftTrigger().whileTrue(new CoralIntestine(coralToScoring, -0.2  )); // Coral Intestine (Removes coral from intake)
+        driverController.leftTrigger().whileTrue((coralToScoring.spinIntestine(-0.2))); // Coral Intestine (Removes coral from intake)
         driverController.leftTrigger().onTrue(Commands.print("Removing Coral From Intake")); // Debug Print
-        driverController.leftTrigger().onFalse(new InstantCommand(() -> coralToScoring.stopIntestine())); // Safety Stop
+        driverController.leftTrigger().onFalse((coralToScoring.stopIntestine())); // Safety Stop
 
-        driverController.povLeft().whileTrue(new CoralColon(coralScoring, 0.1)); // Coral Colon (Moves it towards intake)
+        driverController.povLeft().whileTrue((coralScoring.spinColon(0.2 ))); // Coral Colon (Moves it towards intake)
         driverController.povLeft().onTrue(Commands.print("Coral Colon Moving Back, In to Robot")); // Debug Print
-        driverController.povLeft().onFalse(new InstantCommand(() -> coralScoring.stopColon())); // Safety Stop
+        driverController.povLeft().onFalse(coralScoring.stopColon()); // Safety Stop
 
-        driverController.povRight().whileTrue(new CoralColon(coralScoring, -0.1)); // Coral Colon (Moves coral out of robot to elevator)
+        driverController.povRight().whileTrue((coralScoring.spinColon(-0.2))); // Coral Colon (Moves coral out of robot to elevator)
         driverController.povRight().onTrue(Commands.print("Coral Colon Moving Forward, Out of Robot")); // Debug Print
-        driverController.povRight().onFalse(new InstantCommand(() -> coralScoring.stopColon())); // Safety Stop
+        driverController.povLeft().onFalse(coralScoring.stopColon()); // Safety Stop
+
+        //Auto Thingies
+        new Trigger(() -> !armLimitSwitch.get())
+        .whileTrue(new AutoIntestineSchmoovement(armMover, coralToScoring));
+
     }   
+    
 
 
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        return autoChooser.getSelected();
     }
 }
