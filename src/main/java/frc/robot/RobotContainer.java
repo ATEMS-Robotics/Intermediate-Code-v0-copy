@@ -56,9 +56,9 @@ public class RobotContainer {
     private final CoralTransfer coralToScoring = new CoralTransfer();
     
     private final SendableChooser<Command> autoChooser;
-    
+
     public RobotContainer() {
-        registerNamedCommands();
+        
         autoChooser = AutoBuilder.buildAutoChooser("driveBack");
         autoChooser.setDefaultOption("Drive Back", AutoBuilder.buildAuto("driveBack"));
         SmartDashboard.putData("Auto Mode", autoChooser);
@@ -144,8 +144,8 @@ public class RobotContainer {
         driverController.povDown().onTrue(armMover.moveToArmPosition(-.115)); // Coral Arm Up
         driverController.povDown().onTrue(Commands.print("DOWN")); // Debug Print
 
-        testController.y().onTrue(armMover.printArmRotations()); 
-        //testController.a().onTrue(armMover.setArmPosZero());
+        safetyController.button(0).onTrue(armMover.printArmRotations());
+
 
         // Spin Intake Wheels
         driverController.b().whileTrue((IntakeWheelMover.spinIntakeCommand(0.3))); // Coral go ouT

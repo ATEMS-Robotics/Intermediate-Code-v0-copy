@@ -117,7 +117,11 @@ public void setArmPosition(double NewArmPosition) {
             wasResetByLimit = false;
         } */
     
-   
+        public Command setPositionToZero() {
+            return runOnce(() -> {
+                armMotor.setPosition(0);
+            });
+        }
     public Command stopArm() {
         return runOnce(() -> {
             armMotor.setControl(motionMagic.withPosition(0.25));
@@ -131,10 +135,12 @@ public void setArmPosition(double NewArmPosition) {
     SmartDashboard.putNumber("armCurrent", armMotor.getStatorCurrent().getValueAsDouble());
     SmartDashboard.putNumber("Gravity Comp", KG);
     SmartDashboard.putNumber("P Value", config.Slot0.kP);
-
-
-
+   
     }
+
+
+
+    
          
 
     
