@@ -6,7 +6,6 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -15,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.ElevatorFella;
 import frc.robot.COMMANDS.AutoIntestineSchmoovement;
+import frc.robot.autos.BasicDriveForward;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeArmMovement;
@@ -53,10 +53,11 @@ public class RobotContainer {
     private final CoralTransfer coralToScoring = new CoralTransfer();
     
     private final SendableChooser<Command> autoChooser;
-
-    public RobotContainer() {
-        
-        autoChooser = AutoBuilder.buildAutoChooser("driveBack");
+    
+        public RobotContainer() {
+            
+        autoChooser = AutoBuilder.buildAutoChooser("Tests");
+        autoChooser.setDefaultOption("Drive Forward", new BasicDriveForward(drivetrain));
         autoChooser.setDefaultOption("Drive Back", AutoBuilder.buildAuto("driveBack"));
         SmartDashboard.putData("Auto Mode", autoChooser);
 
@@ -126,6 +127,7 @@ public class RobotContainer {
         driverController.y().onTrue(Commands.print("Intake Arm Go -1")); // Debug Print
 
         safetyController.button(0).onTrue(armMover.printArmRotations());
+        safetyController.button(1).onTrue(armMover.setPositionToZero());
 
 
         // Spin Intake Wheels

@@ -23,8 +23,7 @@ public class Robot extends TimedRobot {
   }
   
 public void robotInit() {
-  CommandSwerveDrivetrain.configureAutoBuilder();
-}
+  }
 
   @Override
   public void robotPeriodic() {

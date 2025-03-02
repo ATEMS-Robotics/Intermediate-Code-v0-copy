@@ -327,4 +327,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     ) {
         super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds), visionMeasurementStdDevs);
     }
+    
+    public void drive(double speed, int direction, int rotation, boolean fieldRelative) {
+
+        // Implementation of the drive method
+
+    }
 }   

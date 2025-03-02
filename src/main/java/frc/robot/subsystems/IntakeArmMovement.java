@@ -72,7 +72,11 @@ public class IntakeArmMovement extends SubsystemBase {
             System.out.println(getCurrentAngle() + ": Rotations");
         });
     }
-
+    public Command setPositionToZero() {
+        return runOnce(() -> {
+            armMotor.setPosition(0);
+        });
+    }
 
 
 
