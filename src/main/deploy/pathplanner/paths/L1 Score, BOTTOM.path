@@ -3,25 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.107148972602739,
-        "y": 1.4180436643835617
+        "x": 7.572945205479453,
+        "y": 0.5165025684931505
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.857148972602739,
-        "y": 1.4180436643835617
+        "x": 7.107148972602739,
+        "y": 1.027375856164383
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.492679794520548,
-        "y": 1.4180436643835617
+        "x": 4.252268835616438,
+        "y": 1.132555650684932
       },
       "prevControl": {
-        "x": 4.928424657534247,
-        "y": 1.4238875892340348
+        "x": 5.815537424697444,
+        "y": 1.1665397504475614
+      },
+      "nextControl": {
+        "x": 2.8699058219178077,
+        "y": 1.102504280821919
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.7864726027397264,
+        "y": 2.8905607876712325
+      },
+      "prevControl": {
+        "x": 3.7263698630136988,
+        "y": 2.5900470890410965
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,7 +47,14 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "L1 Arm Score",
+      "waypointRelativePos": 2.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -42,7 +65,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -30.963756532073536
   },
   "reversed": false,
   "folder": null,

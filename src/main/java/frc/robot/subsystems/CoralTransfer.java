@@ -13,9 +13,9 @@ public class CoralTransfer extends SubsystemBase {
 
     public CoralTransfer(){
         coralIntestine = new SparkMax(24, MotorType.kBrushless); // Replace with actual CAN ID
-        SparkMaxConfig coralColonConfig = new SparkMaxConfig();
+        SparkMaxConfig coralIntestineConfig = new SparkMaxConfig();
 
-        coralColonConfig.idleMode(IdleMode.kBrake);
+        coralIntestineConfig.idleMode(IdleMode.kBrake);
   
     }
 

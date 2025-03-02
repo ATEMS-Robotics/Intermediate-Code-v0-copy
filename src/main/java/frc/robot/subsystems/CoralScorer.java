@@ -18,10 +18,10 @@ public class CoralScorer extends SubsystemBase {
     public CoralScorer() {
         coralColon = new SparkMax(25, MotorType.kBrushless); // Replace with actual CAN ID
         SparkMaxConfig config = new SparkMaxConfig();
-        config
+        config      
             .inverted(false)
             .idleMode(IdleMode.kBrake);
-        
+            
         
             coralColon.configure(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
         

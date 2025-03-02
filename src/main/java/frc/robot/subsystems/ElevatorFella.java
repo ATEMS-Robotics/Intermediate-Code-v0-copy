@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -19,20 +20,21 @@ public class ElevatorFella extends SubsystemBase {
         elevatorMotor2 = new TalonFX(21, "rio");
 
         // Motion Magic Configuration
-        config.Slot0.kS = 0.1; 
-        config.Slot0.kV = 0.2; 
-        config.Slot0.kA = 0.05; 
-        config.Slot0.kP = 0.4;  
+        config.Slot0.kS = 0.2; 
+        config.Slot0.kV = 1.0; 
+        config.Slot0.kA = 0.5; 
+        config.Slot0.kP = 35;   
         config.Slot0.kI = 0.0;  
-        config.Slot0.kD = 0.3;  
+        config.Slot0.kD = 0.2;  
         config.Slot0.kG = 1.6775;  
 
-        config.MotionMagic.MotionMagicCruiseVelocity = 1;
-        config.MotionMagic.MotionMagicAcceleration = 1;
-        config.MotionMagic.MotionMagicJerk = 5;
+        config.MotionMagic.MotionMagicCruiseVelocity = 20;
+        config.MotionMagic.MotionMagicAcceleration = 20;
+        config.MotionMagic.MotionMagicJerk = 600;
 
         elevatorMotor1.setNeutralMode(NeutralModeValue.Brake);
         elevatorMotor2.setNeutralMode(NeutralModeValue.Brake);
+
     }
 
     public void setElevatorPosition(double targetPosition) {
@@ -63,7 +65,15 @@ public class ElevatorFella extends SubsystemBase {
             elevatorMotor2.setControl(motionMagicControl.withPosition(-targetPosition));
         }).until(() -> Math.abs(getCurrentPosition() - targetPosition) < 1.0);
     }
-    }
+    
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Elevator 1 Veloc. ", elevatorMotor1.getVelocity().getValueAsDouble());
+        SmartDashboard.putNumber("Elevator 2 Veloc. ", elevatorMotor2.getVelocity().getValueAsDouble());
+        SmartDashboard.putNumber("Elevator 1 Amps", elevatorMotor1.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Elevator 2 Amps", elevatorMotor2.getStatorCurrent().getValueAsDouble());
+    }}
 
 
     //Still need to change to In inches
