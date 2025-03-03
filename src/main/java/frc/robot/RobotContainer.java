@@ -144,7 +144,6 @@ public class RobotContainer {
         driverController.povDown().onTrue(armMover.moveToArmPosition(-.115)); // Coral Arm Up
         driverController.povDown().onTrue(Commands.print("DOWN")); // Debug Print
 
-        safetyController.button(0).onTrue(armMover.printArmRotations());
 
 
         // Spin Intake Wheels
